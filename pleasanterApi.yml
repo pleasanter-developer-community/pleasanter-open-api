@@ -1,0 +1,731 @@
+swagger: '2.0'
+info:
+  title: Pleasanter API
+  version: 1.0.0
+  description: Pleasanter.net のAPIを実行するカスタムコネクタです。
+host: pleasanter.net
+basePath: /fs/api
+schemes:
+  - https
+securityDefinitions: {}
+paths:
+  /items/{siteIdOrRecordId}/get:
+    post:
+      operationId: ItemsGet
+      summary: Items Get
+      description: 指定した単一のレコードまたは、指定したテーブルの複数レコードを取得します。
+      consumes:
+        - application/json
+      parameters:
+        - name: siteIdOrRecordId
+          in: path
+          required: true
+          type: integer
+          format: int64
+        - name: requestBody
+          in: body
+          schema:
+            type: object
+            properties:
+              ApiVersion:
+                $ref: '#/definitions/apiVersion'
+              ApiKey:
+                type: string
+              View:
+                $ref: '#/definitions/view'
+          required: true
+      responses:
+        '200':
+          description: Success
+          schema:
+            type: object
+            properties:
+              StatusCode:
+                type: integer
+              LimitPerDate:
+                type: integer
+              LimitRemaining:
+                type: integer
+              Response:
+                type: object
+                properties:
+                  Offset:
+                    type: integer
+                  PageSize:
+                    type: integer
+                  TotalCount:
+                    type: integer
+                  Data:
+                    type: array
+                    items:
+                      $ref: '#/definitions/responseItem'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error40x'
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error40x'
+        '403':
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error40x'
+        '500':
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error50x'
+  /items/{recordId}/update:
+    post:
+      operationId: ItemsUpdate
+      summary: Items Update
+      description: 指定したレコードの内容を更新します。
+      consumes:
+        - application/json
+      parameters:
+        - name: recordId
+          in: path
+          required: true
+          type: integer
+          format: int64
+        - name: requestBody
+          in: body
+          schema:
+            $ref: '#/definitions/requestItem'
+      responses:
+        '200':
+          description: Success
+          schema:
+            type: object
+            properties:
+              Id:
+                type: integer
+              StatusCode:
+                type: integer
+              LimitPerDate:
+                type: integer
+              LimitRemaining:
+                type: integer
+              Message:
+                type: string
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error40x'
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error40x'
+        '403':
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error40x'
+        '500':
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error50x'
+  /items/{siteId}/create:
+    post:
+      operationId: ItemsCreate
+      summary: Items Create
+      description: 指定したテーブルに新規レコードを作成します。
+      consumes:
+        - application/json
+      parameters:
+        - name: siteId
+          in: path
+          required: true
+          type: integer
+          format: int64
+        - name: requestBody
+          in: body
+          schema:
+            $ref: '#/definitions/requestItem'
+      responses:
+        '200':
+          description: Success
+          schema:
+            type: object
+            properties:
+              Id:
+                type: integer
+              StatusCode:
+                type: integer
+              LimitPerDate:
+                type: integer
+              LimitRemaining:
+                type: integer
+              Message:
+                type: string
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error40x'
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error40x'
+        '403':
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error40x'
+        '500':
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error50x'
+  /items/{recordId}/delete:
+    post:
+      operationId: ItemsDelete
+      summary: Items Delete
+      description: 指定したレコードを削除します。
+      consumes:
+        - application/json
+      parameters:
+        - name: recordId
+          in: path
+          required: true
+          type: integer
+          format: int64
+        - name: requestBody
+          in: body
+          schema:
+            type: object
+            properties:
+              ApiVersion:
+                $ref: '#/definitions/apiVersion'
+              ApiKey:
+                type: string
+      responses:
+        '200':
+          description: Success
+          schema:
+            type: object
+            properties:
+              Id:
+                type: integer
+              StatusCode:
+                type: integer
+              LimitPerDate:
+                type: integer
+              LimitRemaining:
+                type: integer
+              Message:
+                type: string
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error40x'
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error40x'
+        '403':
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error40x'
+        '500':
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error50x'
+definitions:
+  apiVersion:
+    type: string
+    enum:
+      - '1.1'
+      - '1.0'
+  view:
+    type: object
+    properties:
+      Incomplete:
+        type: boolean
+      Own:
+        type: boolean
+      NearCompetitionTime:
+        type: boolean
+      Delay:
+        type: boolean
+      Overdue:
+        type: boolean
+      Search:
+        type: string
+      ColumnFilterHash:
+        type: object
+      ColumnSorterHash:
+        type: object
+      ApiDataType:
+        type: string
+        enum:
+          - Default
+          - KeyValues
+      ApiColumnKeyDisplayType:
+        type: string
+        enum:
+          - LabelText
+          - ColumnName
+      ApiColumnValueDisplayType:
+        type: string
+        enum:
+          - DisplayValue
+          - Value
+          - Text
+      ApiColumnHash:
+        type: object
+      GridColumns:
+        type: object
+      MergeSessionViewFilters:
+        type: boolean
+      MergeSessionViewSorters:
+        type: boolean
+  requestItem:
+    type: object
+    properties:
+      ApiVersion:
+        $ref: '#/definitions/apiVersion'
+      ApiKey:
+        type: string
+      Title:
+        type: string
+      Body:
+        type: string
+      StartTime:
+        type: string
+      CompletionTime:
+        type: string
+      WorkValue:
+        type: number
+      ProgressRate:
+        type: number
+      RemainingWorkValue:
+        type: number
+      Status:
+        type: integer
+      Manager:
+        type: integer
+      Owner:
+        type: integer
+      Locked:
+        type: boolean
+      Comments:
+        type: string
+      ItemTitle:
+        type: string
+      ClassHash:
+        type: object
+      NumHash:
+        type: object
+      DateHash:
+        type: object
+      DescriptionHash:
+        type: object
+      CheckHash:
+        type: object
+      AttachmentsHash:
+        type: object
+  responseItem:
+    type: object
+    properties:
+      SiteId:
+        type: integer
+        format: int64
+      UpdatedTime:
+        type: string
+      ResultId:
+        type: integer
+        format: int64
+      IssueId:
+        type: integer
+        format: int64
+      Ver:
+        type: integer
+      Title:
+        type: string
+      Body:
+        type: string
+      StartTime:
+        type: string
+      CompletionTime:
+        type: string
+      WorkValue:
+        type: number
+      ProgressRate:
+        type: number
+      RemainingWorkValue:
+        type: number
+      Status:
+        type: integer
+      Manager:
+        type: integer
+      Owner:
+        type: integer
+      Locked:
+        type: boolean
+      Comments:
+        type: string
+      Creator:
+        type: integer
+      Updator:
+        type: integer
+      CreatedTime:
+        type: string
+      ItemTitle:
+        type: string
+      ApiVersion:
+        type: number
+      ClassHash:
+        type: object
+        properties:
+          ClassA:
+            type: string
+          ClassB:
+            type: string
+          ClassC:
+            type: string
+          ClassD:
+            type: string
+          ClassE:
+            type: string
+          ClassF:
+            type: string
+          ClassG:
+            type: string
+          ClassH:
+            type: string
+          ClassI:
+            type: string
+          ClassJ:
+            type: string
+          ClassK:
+            type: string
+          ClassL:
+            type: string
+          ClassM:
+            type: string
+          ClassN:
+            type: string
+          ClassO:
+            type: string
+          ClassP:
+            type: string
+          ClassQ:
+            type: string
+          ClassR:
+            type: string
+          ClassS:
+            type: string
+          ClassT:
+            type: string
+          ClassU:
+            type: string
+          ClassV:
+            type: string
+          ClassW:
+            type: string
+          ClassX:
+            type: string
+          ClassY:
+            type: string
+          ClassZ:
+            type: string
+      NumHash:
+        type: object
+        properties:
+          NumA:
+            type: number
+          NumB:
+            type: number
+          NumC:
+            type: number
+          NumD:
+            type: number
+          NumE:
+            type: number
+          NumF:
+            type: number
+          NumG:
+            type: number
+          NumH:
+            type: number
+          NumI:
+            type: number
+          NumJ:
+            type: number
+          NumK:
+            type: number
+          NumL:
+            type: number
+          NumM:
+            type: number
+          NumN:
+            type: number
+          NumO:
+            type: number
+          NumP:
+            type: number
+          NumQ:
+            type: number
+          NumR:
+            type: number
+          NumS:
+            type: number
+          NumT:
+            type: number
+          NumU:
+            type: number
+          NumV:
+            type: number
+          NumW:
+            type: number
+          NumX:
+            type: number
+          NumY:
+            type: number
+          NumZ:
+            type: number
+      DateHash:
+        type: object
+        properties:
+          DateA:
+            type: string
+          DateB:
+            type: string
+          DateC:
+            type: string
+          DateD:
+            type: string
+          DateE:
+            type: string
+          DateF:
+            type: string
+          DateG:
+            type: string
+          DateH:
+            type: string
+          DateI:
+            type: string
+          DateJ:
+            type: string
+          DateK:
+            type: string
+          DateL:
+            type: string
+          DateM:
+            type: string
+          DateN:
+            type: string
+          DateO:
+            type: string
+          DateP:
+            type: string
+          DateQ:
+            type: string
+          DateR:
+            type: string
+          DateS:
+            type: string
+          DateT:
+            type: string
+          DateU:
+            type: string
+          DateV:
+            type: string
+          DateW:
+            type: string
+          DateX:
+            type: string
+          DateY:
+            type: string
+          DateZ:
+            type: string
+      DescriptionHash:
+        type: object
+        properties:
+          DescriptionA:
+            type: string
+          DescriptionB:
+            type: string
+          DescriptionC:
+            type: string
+          DescriptionD:
+            type: string
+          DescriptionE:
+            type: string
+          DescriptionF:
+            type: string
+          DescriptionG:
+            type: string
+          DescriptionH:
+            type: string
+          DescriptionI:
+            type: string
+          DescriptionJ:
+            type: string
+          DescriptionK:
+            type: string
+          DescriptionL:
+            type: string
+          DescriptionM:
+            type: string
+          DescriptionN:
+            type: string
+          DescriptionO:
+            type: string
+          DescriptionP:
+            type: string
+          DescriptionQ:
+            type: string
+          DescriptionR:
+            type: string
+          DescriptionS:
+            type: string
+          DescriptionT:
+            type: string
+          DescriptionU:
+            type: string
+          DescriptionV:
+            type: string
+          DescriptionW:
+            type: string
+          DescriptionX:
+            type: string
+          DescriptionY:
+            type: string
+          DescriptionZ:
+            type: string
+      CheckHash:
+        type: object
+        properties:
+          CheckA:
+            type: boolean
+          CheckB:
+            type: boolean
+          CheckC:
+            type: boolean
+          CheckD:
+            type: boolean
+          CheckE:
+            type: boolean
+          CheckF:
+            type: boolean
+          CheckG:
+            type: boolean
+          CheckH:
+            type: boolean
+          CheckI:
+            type: boolean
+          CheckJ:
+            type: boolean
+          CheckK:
+            type: boolean
+          CheckL:
+            type: boolean
+          CheckM:
+            type: boolean
+          CheckN:
+            type: boolean
+          CheckO:
+            type: boolean
+          CheckP:
+            type: boolean
+          CheckQ:
+            type: boolean
+          CheckR:
+            type: boolean
+          CheckS:
+            type: boolean
+          CheckT:
+            type: boolean
+          CheckU:
+            type: boolean
+          CheckV:
+            type: boolean
+          CheckW:
+            type: boolean
+          CheckX:
+            type: boolean
+          CheckY:
+            type: boolean
+          CheckZ:
+            type: boolean
+      AttachmentsHash:
+        type: object
+        properties:
+          AttachmentsA:
+            $ref: '#/definitions/attachments'
+          AttachmentsB:
+            $ref: '#/definitions/attachments'
+          AttachmentsC:
+            $ref: '#/definitions/attachments'
+          AttachmentsD:
+            $ref: '#/definitions/attachments'
+          AttachmentsE:
+            $ref: '#/definitions/attachments'
+          AttachmentsF:
+            $ref: '#/definitions/attachments'
+          AttachmentsG:
+            $ref: '#/definitions/attachments'
+          AttachmentsH:
+            $ref: '#/definitions/attachments'
+          AttachmentsI:
+            $ref: '#/definitions/attachments'
+          AttachmentsJ:
+            $ref: '#/definitions/attachments'
+          AttachmentsK:
+            $ref: '#/definitions/attachments'
+          AttachmentsL:
+            $ref: '#/definitions/attachments'
+          AttachmentsM:
+            $ref: '#/definitions/attachments'
+          AttachmentsN:
+            $ref: '#/definitions/attachments'
+          AttachmentsO:
+            $ref: '#/definitions/attachments'
+          AttachmentsP:
+            $ref: '#/definitions/attachments'
+          AttachmentsQ:
+            $ref: '#/definitions/attachments'
+          AttachmentsR:
+            $ref: '#/definitions/attachments'
+          AttachmentsS:
+            $ref: '#/definitions/attachments'
+          AttachmentsT:
+            $ref: '#/definitions/attachments'
+          AttachmentsU:
+            $ref: '#/definitions/attachments'
+          AttachmentsV:
+            $ref: '#/definitions/attachments'
+          AttachmentsW:
+            $ref: '#/definitions/attachments'
+          AttachmentsX:
+            $ref: '#/definitions/attachments'
+          AttachmentsY:
+            $ref: '#/definitions/attachments'
+          AttachmentsZ:
+            $ref: '#/definitions/attachments'
+  attachments:
+    type: array
+    items:
+      type: object
+      properties:
+        Guid:
+          type: string
+        Name:
+          type: string
+        ContentType:
+          type: string
+        Base64:
+          type: string
+  error40x:
+    type: object
+    properties:
+      Id:
+        type: integer
+        format: int64
+      StatusCode:
+        type: integer
+      Message:
+        type: string
+  error50x:
+    type: object
+    properties:
+      Message:
+        type: string
