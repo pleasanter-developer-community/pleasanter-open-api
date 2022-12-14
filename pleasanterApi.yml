@@ -2,7 +2,7 @@ swagger: '2.0'
 info:
   title: Pleasanter API (非公式)
   version: 1.0.0
-  description: Pleasanter.net のAPIを実行するカスタムコネクタです。
+  description: Pleasanter.net のAPIドキュメント
 host: pleasanter.net
 basePath: /fs/api
 schemes:
