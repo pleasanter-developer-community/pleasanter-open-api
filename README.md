@@ -1,3 +1,3 @@
 # PleasanterAPI
 
-[Pleasanter API Documents](https://pierre3.github.io/PleasanterAPI/)
+[Pleasanter API Document](https://pleasanter-developer-community.github.io/pleasanter-open-api/)
