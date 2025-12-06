@@ -1,10 +1,10 @@
 swagger: '2.0'
 info:
   title: Pleasanter API (非公式)
-  version: 1.0.0
-  description: Pleasanter.net のAPIドキュメント
-host: pleasanter.net
-basePath: /fs/api
+  version: 1.1.0
+  description: Pleasanter APIドキュメント(デモ環境用)
+host: demo.pleasanter.org
+basePath: /
 schemes:
   - https
 securityDefinitions: {}
@@ -31,6 +31,9 @@ paths:
                 $ref: '#/definitions/apiVersion'
               ApiKey:
                 type: string
+              Offset:
+                type: integer
+                description: ページングで後続のレコードを取得するためのオフセット値
               View:
                 $ref: '#/definitions/view'
           required: true
@@ -240,8 +243,9 @@ definitions:
         type: boolean
       Own:
         type: boolean
-      NearCompetitionTime:
+      NearCompletionTime:
         type: boolean
+        description: 期限が近い
       Delay:
         type: boolean
       Overdue:
@@ -250,6 +254,16 @@ definitions:
         type: string
       ColumnFilterHash:
         type: object
+      ColumnFilterSearchTypes:
+        type: object
+        description: 項目ごとの検索方法を指定
+        additionalProperties:
+          $ref: '#/definitions/columnFilterSearchType'
+      ColumnFilterNegatives:
+        type: array
+        items:
+          type: string
+        description: 否定条件にする項目名の配列
       ColumnSorterHash:
         type: object
       ApiDataType:
@@ -321,6 +335,21 @@ definitions:
         type: object
       AttachmentsHash:
         type: object
+      ProcessId:
+        type: integer
+        description: プロセスのIDを指定
+      ProcessIds:
+        type: array
+        items:
+          type: integer
+        description: 複数のプロセスのIDを指定
+      ImageHash:
+        $ref: '#/definitions/imageHash'
+      RecordPermissions:
+        type: array
+        items:
+          type: string
+        description: 'レコードのアクセス制御を指定（例: User,10,1 / Dept,1,31 / Group,1,511）'
   responseItem:
     type: object
     properties:
@@ -729,3 +758,97 @@ definitions:
     properties:
       Message:
         type: string
+  columnFilterSearchType:
+    type: string
+    description: 検索方法
+    enum:
+      - PartialMatch
+      - ExactMatch
+      - ForwardMatch
+      - PartialMatchMultiple
+      - ExactMatchMultiple
+      - ForwardMatchMultiple
+  imageHash:
+    type: object
+    description: 内容、コメント、説明項目に画像を挿入するためのオブジェクト
+    properties:
+      Body:
+        $ref: '#/definitions/imageHashItem'
+      Comments:
+        $ref: '#/definitions/imageHashItem'
+      DescriptionA:
+        $ref: '#/definitions/imageHashItem'
+      DescriptionB:
+        $ref: '#/definitions/imageHashItem'
+      DescriptionC:
+        $ref: '#/definitions/imageHashItem'
+      DescriptionD:
+        $ref: '#/definitions/imageHashItem'
+      DescriptionE:
+        $ref: '#/definitions/imageHashItem'
+      DescriptionF:
+        $ref: '#/definitions/imageHashItem'
+      DescriptionG:
+        $ref: '#/definitions/imageHashItem'
+      DescriptionH:
+        $ref: '#/definitions/imageHashItem'
+      DescriptionI:
+        $ref: '#/definitions/imageHashItem'
+      DescriptionJ:
+        $ref: '#/definitions/imageHashItem'
+      DescriptionK:
+        $ref: '#/definitions/imageHashItem'
+      DescriptionL:
+        $ref: '#/definitions/imageHashItem'
+      DescriptionM:
+        $ref: '#/definitions/imageHashItem'
+      DescriptionN:
+        $ref: '#/definitions/imageHashItem'
+      DescriptionO:
+        $ref: '#/definitions/imageHashItem'
+      DescriptionP:
+        $ref: '#/definitions/imageHashItem'
+      DescriptionQ:
+        $ref: '#/definitions/imageHashItem'
+      DescriptionR:
+        $ref: '#/definitions/imageHashItem'
+      DescriptionS:
+        $ref: '#/definitions/imageHashItem'
+      DescriptionT:
+        $ref: '#/definitions/imageHashItem'
+      DescriptionU:
+        $ref: '#/definitions/imageHashItem'
+      DescriptionV:
+        $ref: '#/definitions/imageHashItem'
+      DescriptionW:
+        $ref: '#/definitions/imageHashItem'
+      DescriptionX:
+        $ref: '#/definitions/imageHashItem'
+      DescriptionY:
+        $ref: '#/definitions/imageHashItem'
+      DescriptionZ:
+        $ref: '#/definitions/imageHashItem'
+  imageHashItem:
+    type: object
+    description: 画像挿入の詳細設定
+    properties:
+      HeadNewLine:
+        type: boolean
+        description: 画像を挿入する際の先頭の改行有無
+      EndNewLine:
+        type: boolean
+        description: 画像を挿入する際の末尾の改行有無
+      Position:
+        type: integer
+        description: 画像を何文字目に挿入するか（-1または省略で末尾）
+      Alt:
+        type: string
+        description: alt属性に挿入する文字列
+      Extension:
+        type: string
+        description: ファイル拡張子（省略時は.png）
+      Base64:
+        type: string
+        description: Base64エンコードした画像のバイナリデータ
+    required:
+      - Base64
