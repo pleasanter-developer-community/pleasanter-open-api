@@ -238,22 +238,29 @@ definitions:
       - '1.0'
   view:
     type: object
+    description: フィルタやソートの条件を指定するオブジェクト
     properties:
       Incomplete:
         type: boolean
+        description: 未完了のレコードのみ取得
       Own:
         type: boolean
+        description: 自分が担当のレコードのみ取得
       NearCompletionTime:
         type: boolean
-        description: 期限が近い
+        description: 期限が近いレコードのみ取得
       Delay:
         type: boolean
+        description: 遅延しているレコードのみ取得
       Overdue:
         type: boolean
+        description: 期限超過のレコードのみ取得
       Search:
         type: string
+        description: 検索キーワード
       ColumnFilterHash:
         type: object
+        description: 列フィルタ条件をキーと値のペアで指定
       ColumnFilterSearchTypes:
         type: object
         description: 項目ごとの検索方法を指定
@@ -266,85 +273,118 @@ definitions:
         description: 否定条件にする項目名の配列
       ColumnSorterHash:
         type: object
+        description: ソート条件を項目名とasc/descのペアで指定
       ApiDataType:
         type: string
+        description: APIの形式を指定（KeyValuesで表示名形式）
         enum:
           - Default
           - KeyValues
       ApiColumnKeyDisplayType:
         type: string
+        description: レスポンスのKeyの表示形式を指定
         enum:
           - LabelText
           - ColumnName
       ApiColumnValueDisplayType:
         type: string
+        description: レスポンスのValueの表示形式を指定
         enum:
           - DisplayValue
           - Value
           - Text
       ApiColumnHash:
         type: object
+        description: 項目単位でKey/Valueの表示形式を指定
       GridColumns:
-        type: object
+        type: array
+        items:
+          type: string
+        description: 返却される項目を制御する配列
       MergeSessionViewFilters:
         type: boolean
+        description: セッションのフィルタ条件とマージするか
       MergeSessionViewSorters:
         type: boolean
+        description: セッションのソート条件とマージするか
   requestItem:
     type: object
+    description: レコード作成・更新時のリクエストボディ
     properties:
       ApiVersion:
         $ref: '#/definitions/apiVersion'
+        description: APIバージョン
       ApiKey:
         type: string
+        description: APIキー
       Title:
         type: string
+        description: タイトル項目
       Body:
         type: string
+        description: 内容項目
       StartTime:
         type: string
+        description: 開始日時（期限付きテーブルのみ）
       CompletionTime:
         type: string
+        description: 完了日時（期限付きテーブルのみ）
       WorkValue:
         type: number
+        description: 作業量（期限付きテーブルのみ）
       ProgressRate:
         type: number
+        description: 進捗率（期限付きテーブルのみ）
       RemainingWorkValue:
         type: number
+        description: 残作業量（期限付きテーブルのみ）
       Status:
         type: integer
+        description: 状況項目
       Manager:
         type: integer
+        description: 管理者のユーザID
       Owner:
         type: integer
+        description: 担当者のユーザID
       Locked:
         type: boolean
+        description: ロック状態
       Comments:
         type: string
+        description: コメント項目
       ItemTitle:
         type: string
+        description: タイトル項目（別名）
       ClassHash:
         type: object
+        description: 分類項目（ClassA～ClassZのキーと値のペア）
       NumHash:
         type: object
+        description: 数値項目（NumA～NumZのキーと値のペア）
       DateHash:
         type: object
+        description: 日付項目（DateA～DateZのキーと値のペア）
       DescriptionHash:
         type: object
+        description: 説明項目（DescriptionA～DescriptionZのキーと値のペア）
       CheckHash:
         type: object
+        description: チェック項目（CheckA～CheckZのキーと値のペア）
       AttachmentsHash:
         type: object
+        description: 添付ファイル項目（AttachmentsA～AttachmentsZのキーと値のペア）
       ProcessId:
         type: integer
-        description: プロセスのIDを指定
+        description: 実行するプロセスのID
       ProcessIds:
         type: array
         items:
           type: integer
-        description: 複数のプロセスのIDを指定
+        description: 実行する複数のプロセスIDの配列
       ImageHash:
         $ref: '#/definitions/imageHash'
+        description: 画像挿入用のオブジェクト
       RecordPermissions:
         type: array
         items:
@@ -352,54 +392,77 @@ definitions:
         description: 'レコードのアクセス制御を指定（例: User,10,1 / Dept,1,31 / Group,1,511）'
   responseItem:
     type: object
+    description: レコード取得時のレスポンスデータ
     properties:
       SiteId:
         type: integer
         format: int64
+        description: サイトID
       UpdatedTime:
         type: string
+        description: 更新日時
       ResultId:
         type: integer
         format: int64
+        description: レコードID（記録テーブルの場合）
       IssueId:
         type: integer
         format: int64
+        description: レコードID（期限付きテーブルの場合）
       Ver:
         type: integer
+        description: バージョン
       Title:
         type: string
+        description: タイトル項目
       Body:
         type: string
+        description: 内容項目
       StartTime:
         type: string
+        description: 開始日時（期限付きテーブルのみ）
       CompletionTime:
         type: string
+        description: 完了日時（期限付きテーブルのみ）
       WorkValue:
         type: number
+        description: 作業量（期限付きテーブルのみ）
       ProgressRate:
         type: number
+        description: 進捗率（期限付きテーブルのみ）
       RemainingWorkValue:
         type: number
+        description: 残作業量（期限付きテーブルのみ）
       Status:
         type: integer
+        description: 状況項目
       Manager:
         type: integer
+        description: 管理者のユーザID
       Owner:
         type: integer
+        description: 担当者のユーザID
       Locked:
         type: boolean
+        description: ロック状態
       Comments:
         type: string
+        description: コメント項目
       Creator:
         type: integer
+        description: 作成者のユーザID
       Updator:
         type: integer
+        description: 更新者のユーザID
       CreatedTime:
         type: string
+        description: 作成日時
       ItemTitle:
         type: string
+        description: タイトル項目
       ApiVersion:
         type: number
+        description: APIバージョン
       ClassHash:
         type: object
         properties:
