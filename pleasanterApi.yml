@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: Pleasanter API (非公式)
-  version: 1.1.0
+  version: 2.0.0
   description: |
     Pleasanter APIドキュメント(デモ環境用)
     
