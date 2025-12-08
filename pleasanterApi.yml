@@ -1,917 +1,1022 @@
-swagger: '2.0'
+openapi: 3.0.3
 info:
   title: Pleasanter API (非公式)
   version: 1.1.0
-  description: Pleasanter APIドキュメント(デモ環境用)
-host: demo.pleasanter.org
-basePath: /
-schemes:
-  - https
-securityDefinitions: {}
+  description: |
+    Pleasanter APIドキュメント(デモ環境用)
+    
+    プリザンターのREST APIを使用して、レコードの取得・作成・更新・削除などの操作を行うことができます。
+  contact:
+    name: Pleasanter Developer Community
+    url: https://github.com/pleasanter-developer-community
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: https://demo.pleasanter.org
+    description: デモ環境
+
+tags:
+  - name: Items
+    description: レコード操作API
+
 paths:
   /items/{siteIdOrRecordId}/get:
     post:
       operationId: ItemsGet
-      summary: Items Get
+      summary: レコード取得
       description: 指定した単一のレコードまたは、指定したテーブルの複数レコードを取得します。
-      consumes:
-        - application/json
+      tags:
+        - Items
       parameters:
-        - name: siteIdOrRecordId
-          in: path
-          required: true
-          type: integer
-          format: int64
-        - name: requestBody
-          in: body
-          schema:
-            type: object
-            properties:
-              ApiVersion:
-                $ref: '#/definitions/apiVersion'
-              ApiKey:
-                type: string
-              Offset:
-                type: integer
-                description: ページングで後続のレコードを取得するためのオフセット値
-              View:
-                $ref: '#/definitions/view'
-          required: true
+        - $ref: '#/components/parameters/SiteIdOrRecordId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ItemsGetRequest'
       responses:
         '200':
           description: Success
-          schema:
-            type: object
-            properties:
-              StatusCode:
-                type: integer
-              LimitPerDate:
-                type: integer
-              LimitRemaining:
-                type: integer
-              Response:
-                type: object
-                properties:
-                  Offset:
-                    type: integer
-                  PageSize:
-                    type: integer
-                  TotalCount:
-                    type: integer
-                  Data:
-                    type: array
-                    items:
-                      $ref: '#/definitions/responseItem'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ItemsGetResponse'
         '400':
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/error40x'
+          $ref: '#/components/responses/BadRequest'
         '401':
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/error40x'
+          $ref: '#/components/responses/Unauthorized'
         '403':
-          description: Not Found
-          schema:
-            $ref: '#/definitions/error40x'
+          $ref: '#/components/responses/Forbidden'
         '500':
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/error50x'
+          $ref: '#/components/responses/InternalServerError'
+
   /items/{recordId}/update:
     post:
       operationId: ItemsUpdate
-      summary: Items Update
+      summary: レコード更新
       description: 指定したレコードの内容を更新します。
-      consumes:
-        - application/json
+      tags:
+        - Items
       parameters:
-        - name: recordId
-          in: path
-          required: true
-          type: integer
-          format: int64
-        - name: requestBody
-          in: body
-          schema:
-            $ref: '#/definitions/requestItem'
+        - $ref: '#/components/parameters/RecordId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ItemRequest'
       responses:
         '200':
           description: Success
-          schema:
-            type: object
-            properties:
-              Id:
-                type: integer
-              StatusCode:
-                type: integer
-              LimitPerDate:
-                type: integer
-              LimitRemaining:
-                type: integer
-              Message:
-                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ItemMutationResponse'
         '400':
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/error40x'
+          $ref: '#/components/responses/BadRequest'
         '401':
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/error40x'
+          $ref: '#/components/responses/Unauthorized'
         '403':
-          description: Not Found
-          schema:
-            $ref: '#/definitions/error40x'
+          $ref: '#/components/responses/Forbidden'
         '500':
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/error50x'
+          $ref: '#/components/responses/InternalServerError'
+
   /items/{siteId}/create:
     post:
       operationId: ItemsCreate
-      summary: Items Create
+      summary: レコード作成
       description: 指定したテーブルに新規レコードを作成します。
-      consumes:
-        - application/json
+      tags:
+        - Items
       parameters:
-        - name: siteId
-          in: path
-          required: true
-          type: integer
-          format: int64
-        - name: requestBody
-          in: body
-          schema:
-            $ref: '#/definitions/requestItem'
+        - $ref: '#/components/parameters/SiteId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ItemRequest'
       responses:
         '200':
           description: Success
-          schema:
-            type: object
-            properties:
-              Id:
-                type: integer
-              StatusCode:
-                type: integer
-              LimitPerDate:
-                type: integer
-              LimitRemaining:
-                type: integer
-              Message:
-                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ItemMutationResponse'
         '400':
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/error40x'
+          $ref: '#/components/responses/BadRequest'
         '401':
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/error40x'
+          $ref: '#/components/responses/Unauthorized'
         '403':
-          description: Not Found
-          schema:
-            $ref: '#/definitions/error40x'
+          $ref: '#/components/responses/Forbidden'
         '500':
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/error50x'
+          $ref: '#/components/responses/InternalServerError'
+
   /items/{recordId}/delete:
     post:
       operationId: ItemsDelete
-      summary: Items Delete
+      summary: レコード削除
       description: 指定したレコードを削除します。
-      consumes:
-        - application/json
+      tags:
+        - Items
       parameters:
-        - name: recordId
-          in: path
-          required: true
-          type: integer
-          format: int64
-        - name: requestBody
-          in: body
-          schema:
-            type: object
-            properties:
-              ApiVersion:
-                $ref: '#/definitions/apiVersion'
-              ApiKey:
-                type: string
+        - $ref: '#/components/parameters/RecordId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApiRequestBase'
       responses:
         '200':
           description: Success
-          schema:
-            type: object
-            properties:
-              Id:
-                type: integer
-              StatusCode:
-                type: integer
-              LimitPerDate:
-                type: integer
-              LimitRemaining:
-                type: integer
-              Message:
-                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ItemMutationResponse'
         '400':
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/error40x'
+          $ref: '#/components/responses/BadRequest'
         '401':
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/error40x'
+          $ref: '#/components/responses/Unauthorized'
         '403':
-          description: Not Found
-          schema:
-            $ref: '#/definitions/error40x'
+          $ref: '#/components/responses/Forbidden'
         '500':
-          description: Internal Server Error
+          $ref: '#/components/responses/InternalServerError'
+
+components:
+  # ==================== Parameters ====================
+  parameters:
+    SiteIdOrRecordId:
+      name: siteIdOrRecordId
+      in: path
+      required: true
+      description: サイトIDまたはレコードID
+      schema:
+        type: integer
+        format: int64
+
+    SiteId:
+      name: siteId
+      in: path
+      required: true
+      description: サイトID
+      schema:
+        type: integer
+        format: int64
+
+    RecordId:
+      name: recordId
+      in: path
+      required: true
+      description: レコードID
+      schema:
+        type: integer
+        format: int64
+
+  # ==================== Responses ====================
+  responses:
+    BadRequest:
+      description: Bad Request
+      content:
+        application/json:
           schema:
-            $ref: '#/definitions/error50x'
-definitions:
-  apiVersion:
-    type: string
-    enum:
-      - '1.1'
-      - '1.0'
-  view:
-    type: object
-    description: フィルタやソートの条件を指定するオブジェクト
-    properties:
-      Incomplete:
-        type: boolean
-        description: 未完了のレコードのみ取得
-      Own:
-        type: boolean
-        description: 自分が担当のレコードのみ取得
-      NearCompletionTime:
-        type: boolean
-        description: 期限が近いレコードのみ取得
-      Delay:
-        type: boolean
-        description: 遅延しているレコードのみ取得
-      Overdue:
-        type: boolean
-        description: 期限超過のレコードのみ取得
-      Search:
-        type: string
-        description: 検索キーワード
-      ColumnFilterHash:
-        type: object
-        description: 列フィルタ条件をキーと値のペアで指定
-      ColumnFilterSearchTypes:
-        type: object
-        description: 項目ごとの検索方法を指定
-        additionalProperties:
-          $ref: '#/definitions/columnFilterSearchType'
-      ColumnFilterNegatives:
-        type: array
-        items:
-          type: string
-        description: 否定条件にする項目名の配列
-      ColumnSorterHash:
-        type: object
-        description: ソート条件を項目名とasc/descのペアで指定
-      ApiDataType:
-        type: string
-        description: APIの形式を指定（KeyValuesで表示名形式）
-        enum:
-          - Default
-          - KeyValues
-      ApiColumnKeyDisplayType:
-        type: string
-        description: レスポンスのKeyの表示形式を指定
-        enum:
-          - LabelText
-          - ColumnName
-      ApiColumnValueDisplayType:
-        type: string
-        description: レスポンスのValueの表示形式を指定
-        enum:
-          - DisplayValue
-          - Value
-          - Text
-      ApiColumnHash:
-        type: object
-        description: 項目単位でKey/Valueの表示形式を指定
-      GridColumns:
-        type: array
-        items:
-          type: string
-        description: 返却される項目を制御する配列
-      MergeSessionViewFilters:
-        type: boolean
-        description: セッションのフィルタ条件とマージするか
-      MergeSessionViewSorters:
-        type: boolean
-        description: セッションのソート条件とマージするか
-  requestItem:
-    type: object
-    description: レコード作成・更新時のリクエストボディ
-    properties:
-      ApiVersion:
-        $ref: '#/definitions/apiVersion'
-        description: APIバージョン
-      ApiKey:
-        type: string
-        description: APIキー
-      Title:
-        type: string
-        description: タイトル項目
-      Body:
-        type: string
-        description: 内容項目
-      StartTime:
-        type: string
-        description: 開始日時（期限付きテーブルのみ）
-      CompletionTime:
-        type: string
-        description: 完了日時（期限付きテーブルのみ）
-      WorkValue:
-        type: number
-        description: 作業量（期限付きテーブルのみ）
-      ProgressRate:
-        type: number
-        description: 進捗率（期限付きテーブルのみ）
-      RemainingWorkValue:
-        type: number
-        description: 残作業量（期限付きテーブルのみ）
-      Status:
-        type: integer
-        description: 状況項目
-      Manager:
-        type: integer
-        description: 管理者のユーザID
-      Owner:
-        type: integer
-        description: 担当者のユーザID
-      Locked:
-        type: boolean
-        description: ロック状態
-      Comments:
-        type: string
-        description: コメント項目
-      ItemTitle:
-        type: string
-        description: タイトル項目（別名）
-      ClassHash:
-        type: object
-        description: 分類項目（ClassA～ClassZのキーと値のペア）
-      NumHash:
-        type: object
-        description: 数値項目（NumA～NumZのキーと値のペア）
-      DateHash:
-        type: object
-        description: 日付項目（DateA～DateZのキーと値のペア）
-      DescriptionHash:
-        type: object
-        description: 説明項目（DescriptionA～DescriptionZのキーと値のペア）
-      CheckHash:
-        type: object
-        description: チェック項目（CheckA～CheckZのキーと値のペア）
-      AttachmentsHash:
-        type: object
-        description: 添付ファイル項目（AttachmentsA～AttachmentsZのキーと値のペア）
-      ProcessId:
-        type: integer
-        description: 実行するプロセスのID
-      ProcessIds:
-        type: array
-        items:
-          type: integer
-        description: 実行する複数のプロセスIDの配列
-      ImageHash:
-        $ref: '#/definitions/imageHash'
-        description: 画像挿入用のオブジェクト
-      RecordPermissions:
-        type: array
-        items:
-          type: string
-        description: 'レコードのアクセス制御を指定（例: User,10,1 / Dept,1,31 / Group,1,511）'
-  responseItem:
-    type: object
-    description: レコード取得時のレスポンスデータ
-    properties:
-      SiteId:
-        type: integer
-        format: int64
-        description: サイトID
-      UpdatedTime:
-        type: string
-        description: 更新日時
-      ResultId:
-        type: integer
-        format: int64
-        description: レコードID（記録テーブルの場合）
-      IssueId:
-        type: integer
-        format: int64
-        description: レコードID（期限付きテーブルの場合）
-      Ver:
-        type: integer
-        description: バージョン
-      Title:
-        type: string
-        description: タイトル項目
-      Body:
-        type: string
-        description: 内容項目
-      StartTime:
-        type: string
-        description: 開始日時（期限付きテーブルのみ）
-      CompletionTime:
-        type: string
-        description: 完了日時（期限付きテーブルのみ）
-      WorkValue:
-        type: number
-        description: 作業量（期限付きテーブルのみ）
-      ProgressRate:
-        type: number
-        description: 進捗率（期限付きテーブルのみ）
-      RemainingWorkValue:
-        type: number
-        description: 残作業量（期限付きテーブルのみ）
-      Status:
-        type: integer
-        description: 状況項目
-      Manager:
-        type: integer
-        description: 管理者のユーザID
-      Owner:
-        type: integer
-        description: 担当者のユーザID
-      Locked:
-        type: boolean
-        description: ロック状態
-      Comments:
-        type: string
-        description: コメント項目
-      Creator:
-        type: integer
-        description: 作成者のユーザID
-      Updator:
-        type: integer
-        description: 更新者のユーザID
-      CreatedTime:
-        type: string
-        description: 作成日時
-      ItemTitle:
-        type: string
-        description: タイトル項目
-      ApiVersion:
-        type: number
-        description: APIバージョン
-      ClassHash:
-        type: object
-        properties:
-          ClassA:
-            type: string
-          ClassB:
-            type: string
-          ClassC:
-            type: string
-          ClassD:
-            type: string
-          ClassE:
-            type: string
-          ClassF:
-            type: string
-          ClassG:
-            type: string
-          ClassH:
-            type: string
-          ClassI:
-            type: string
-          ClassJ:
-            type: string
-          ClassK:
-            type: string
-          ClassL:
-            type: string
-          ClassM:
-            type: string
-          ClassN:
-            type: string
-          ClassO:
-            type: string
-          ClassP:
-            type: string
-          ClassQ:
-            type: string
-          ClassR:
-            type: string
-          ClassS:
-            type: string
-          ClassT:
-            type: string
-          ClassU:
-            type: string
-          ClassV:
-            type: string
-          ClassW:
-            type: string
-          ClassX:
-            type: string
-          ClassY:
-            type: string
-          ClassZ:
-            type: string
-      NumHash:
-        type: object
-        properties:
-          NumA:
-            type: number
-          NumB:
-            type: number
-          NumC:
-            type: number
-          NumD:
-            type: number
-          NumE:
-            type: number
-          NumF:
-            type: number
-          NumG:
-            type: number
-          NumH:
-            type: number
-          NumI:
-            type: number
-          NumJ:
-            type: number
-          NumK:
-            type: number
-          NumL:
-            type: number
-          NumM:
-            type: number
-          NumN:
-            type: number
-          NumO:
-            type: number
-          NumP:
-            type: number
-          NumQ:
-            type: number
-          NumR:
-            type: number
-          NumS:
-            type: number
-          NumT:
-            type: number
-          NumU:
-            type: number
-          NumV:
-            type: number
-          NumW:
-            type: number
-          NumX:
-            type: number
-          NumY:
-            type: number
-          NumZ:
-            type: number
-      DateHash:
-        type: object
-        properties:
-          DateA:
-            type: string
-          DateB:
-            type: string
-          DateC:
-            type: string
-          DateD:
-            type: string
-          DateE:
-            type: string
-          DateF:
-            type: string
-          DateG:
-            type: string
-          DateH:
-            type: string
-          DateI:
-            type: string
-          DateJ:
-            type: string
-          DateK:
-            type: string
-          DateL:
-            type: string
-          DateM:
-            type: string
-          DateN:
-            type: string
-          DateO:
-            type: string
-          DateP:
-            type: string
-          DateQ:
-            type: string
-          DateR:
-            type: string
-          DateS:
-            type: string
-          DateT:
-            type: string
-          DateU:
-            type: string
-          DateV:
-            type: string
-          DateW:
-            type: string
-          DateX:
-            type: string
-          DateY:
-            type: string
-          DateZ:
-            type: string
-      DescriptionHash:
-        type: object
-        properties:
-          DescriptionA:
-            type: string
-          DescriptionB:
-            type: string
-          DescriptionC:
-            type: string
-          DescriptionD:
-            type: string
-          DescriptionE:
-            type: string
-          DescriptionF:
-            type: string
-          DescriptionG:
-            type: string
-          DescriptionH:
-            type: string
-          DescriptionI:
-            type: string
-          DescriptionJ:
-            type: string
-          DescriptionK:
-            type: string
-          DescriptionL:
-            type: string
-          DescriptionM:
-            type: string
-          DescriptionN:
-            type: string
-          DescriptionO:
-            type: string
-          DescriptionP:
-            type: string
-          DescriptionQ:
-            type: string
-          DescriptionR:
-            type: string
-          DescriptionS:
-            type: string
-          DescriptionT:
-            type: string
-          DescriptionU:
-            type: string
-          DescriptionV:
-            type: string
-          DescriptionW:
-            type: string
-          DescriptionX:
-            type: string
-          DescriptionY:
-            type: string
-          DescriptionZ:
-            type: string
-      CheckHash:
-        type: object
-        properties:
-          CheckA:
-            type: boolean
-          CheckB:
-            type: boolean
-          CheckC:
-            type: boolean
-          CheckD:
-            type: boolean
-          CheckE:
-            type: boolean
-          CheckF:
-            type: boolean
-          CheckG:
-            type: boolean
-          CheckH:
-            type: boolean
-          CheckI:
-            type: boolean
-          CheckJ:
-            type: boolean
-          CheckK:
-            type: boolean
-          CheckL:
-            type: boolean
-          CheckM:
-            type: boolean
-          CheckN:
-            type: boolean
-          CheckO:
-            type: boolean
-          CheckP:
-            type: boolean
-          CheckQ:
-            type: boolean
-          CheckR:
-            type: boolean
-          CheckS:
-            type: boolean
-          CheckT:
-            type: boolean
-          CheckU:
-            type: boolean
-          CheckV:
-            type: boolean
-          CheckW:
-            type: boolean
-          CheckX:
-            type: boolean
-          CheckY:
-            type: boolean
-          CheckZ:
-            type: boolean
-      AttachmentsHash:
-        type: object
-        properties:
-          AttachmentsA:
-            $ref: '#/definitions/attachments'
-          AttachmentsB:
-            $ref: '#/definitions/attachments'
-          AttachmentsC:
-            $ref: '#/definitions/attachments'
-          AttachmentsD:
-            $ref: '#/definitions/attachments'
-          AttachmentsE:
-            $ref: '#/definitions/attachments'
-          AttachmentsF:
-            $ref: '#/definitions/attachments'
-          AttachmentsG:
-            $ref: '#/definitions/attachments'
-          AttachmentsH:
-            $ref: '#/definitions/attachments'
-          AttachmentsI:
-            $ref: '#/definitions/attachments'
-          AttachmentsJ:
-            $ref: '#/definitions/attachments'
-          AttachmentsK:
-            $ref: '#/definitions/attachments'
-          AttachmentsL:
-            $ref: '#/definitions/attachments'
-          AttachmentsM:
-            $ref: '#/definitions/attachments'
-          AttachmentsN:
-            $ref: '#/definitions/attachments'
-          AttachmentsO:
-            $ref: '#/definitions/attachments'
-          AttachmentsP:
-            $ref: '#/definitions/attachments'
-          AttachmentsQ:
-            $ref: '#/definitions/attachments'
-          AttachmentsR:
-            $ref: '#/definitions/attachments'
-          AttachmentsS:
-            $ref: '#/definitions/attachments'
-          AttachmentsT:
-            $ref: '#/definitions/attachments'
-          AttachmentsU:
-            $ref: '#/definitions/attachments'
-          AttachmentsV:
-            $ref: '#/definitions/attachments'
-          AttachmentsW:
-            $ref: '#/definitions/attachments'
-          AttachmentsX:
-            $ref: '#/definitions/attachments'
-          AttachmentsY:
-            $ref: '#/definitions/attachments'
-          AttachmentsZ:
-            $ref: '#/definitions/attachments'
-  attachments:
-    type: array
-    items:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    InternalServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ServerErrorResponse'
+
+  # ==================== Schemas ====================
+  schemas:
+    # ---------- Base/Common Schemas ----------
+    ApiVersion:
+      type: string
+      description: APIバージョン
+      enum:
+        - '1.1'
+        - '1.0'
+      default: '1.1'
+
+    ApiRequestBase:
       type: object
+      description: API共通リクエストパラメータ
+      properties:
+        ApiVersion:
+          $ref: '#/components/schemas/ApiVersion'
+        ApiKey:
+          type: string
+          description: APIキー
+
+    ApiResponseBase:
+      type: object
+      description: API共通レスポンスパラメータ
+      properties:
+        StatusCode:
+          type: integer
+          description: ステータスコード
+        LimitPerDate:
+          type: integer
+          description: 1日あたりのAPI呼び出し制限数
+        LimitRemaining:
+          type: integer
+          description: 残りのAPI呼び出し可能数
+
+    # ---------- Error Schemas ----------
+    ErrorResponse:
+      type: object
+      description: エラーレスポンス（4xx）
+      properties:
+        Id:
+          type: integer
+          format: int64
+          description: レコードID
+        StatusCode:
+          type: integer
+          description: ステータスコード
+        Message:
+          type: string
+          description: エラーメッセージ
+
+    ServerErrorResponse:
+      type: object
+      description: サーバーエラーレスポンス（5xx）
+      properties:
+        Message:
+          type: string
+          description: エラーメッセージ
+
+    # ---------- Request Schemas ----------
+    ItemsGetRequest:
+      allOf:
+        - $ref: '#/components/schemas/ApiRequestBase'
+        - type: object
+          properties:
+            Offset:
+              type: integer
+              description: ページングで後続のレコードを取得するためのオフセット値
+            View:
+              $ref: '#/components/schemas/View'
+
+    ItemRequest:
+      allOf:
+        - $ref: '#/components/schemas/ApiRequestBase'
+        - $ref: '#/components/schemas/ItemData'
+        - type: object
+          properties:
+            ProcessId:
+              type: integer
+              description: 実行するプロセスのID
+            ProcessIds:
+              type: array
+              items:
+                type: integer
+              description: 実行する複数のプロセスIDの配列
+            ImageHash:
+              $ref: '#/components/schemas/ImageHash'
+            RecordPermissions:
+              type: array
+              items:
+                type: string
+              description: 'レコードのアクセス制御を指定（例: User,10,1 / Dept,1,31 / Group,1,511）'
+
+    # ---------- Response Schemas ----------
+    ItemsGetResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponseBase'
+        - type: object
+          properties:
+            Response:
+              type: object
+              properties:
+                Offset:
+                  type: integer
+                  description: 現在のオフセット値
+                PageSize:
+                  type: integer
+                  description: 1ページあたりの件数
+                TotalCount:
+                  type: integer
+                  description: 総件数
+                Data:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/ResponseItem'
+
+    ItemMutationResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponseBase'
+        - type: object
+          properties:
+            Id:
+              type: integer
+              format: int64
+              description: 作成/更新/削除されたレコードID
+            Message:
+              type: string
+              description: 結果メッセージ
+
+    # ---------- View Schema ----------
+    View:
+      type: object
+      description: フィルタやソートの条件を指定するオブジェクト
+      properties:
+        Incomplete:
+          type: boolean
+          description: 未完了のレコードのみ取得
+        Own:
+          type: boolean
+          description: 自分が担当のレコードのみ取得
+        NearCompletionTime:
+          type: boolean
+          description: 期限が近いレコードのみ取得
+        Delay:
+          type: boolean
+          description: 遅延しているレコードのみ取得
+        Overdue:
+          type: boolean
+          description: 期限超過のレコードのみ取得
+        Search:
+          type: string
+          description: 検索キーワード
+        ColumnFilterHash:
+          type: object
+          description: 列フィルタ条件をキーと値のペアで指定
+          additionalProperties: true
+        ColumnFilterSearchTypes:
+          type: object
+          description: 項目ごとの検索方法を指定
+          additionalProperties:
+            $ref: '#/components/schemas/ColumnFilterSearchType'
+        ColumnFilterNegatives:
+          type: array
+          items:
+            type: string
+          description: 否定条件にする項目名の配列
+        ColumnSorterHash:
+          type: object
+          description: ソート条件を項目名とasc/descのペアで指定
+          additionalProperties:
+            $ref: '#/components/schemas/SortOrder'
+        ApiDataType:
+          $ref: '#/components/schemas/ApiDataType'
+        ApiColumnKeyDisplayType:
+          $ref: '#/components/schemas/ApiColumnKeyDisplayType'
+        ApiColumnValueDisplayType:
+          $ref: '#/components/schemas/ApiColumnValueDisplayType'
+        ApiColumnHash:
+          type: object
+          description: 項目単位でKey/Valueの表示形式を指定
+          additionalProperties: true
+        GridColumns:
+          type: array
+          items:
+            type: string
+          description: 返却される項目を制御する配列
+        MergeSessionViewFilters:
+          type: boolean
+          description: セッションのフィルタ条件とマージするか
+        MergeSessionViewSorters:
+          type: boolean
+          description: セッションのソート条件とマージするか
+
+    # ---------- Enum Schemas ----------
+    ColumnFilterSearchType:
+      type: string
+      description: 検索方法
+      enum:
+        - PartialMatch
+        - ExactMatch
+        - ForwardMatch
+        - PartialMatchMultiple
+        - ExactMatchMultiple
+        - ForwardMatchMultiple
+
+    SortOrder:
+      type: string
+      description: ソート順
+      enum:
+        - asc
+        - desc
+
+    ApiDataType:
+      type: string
+      description: APIの形式を指定（KeyValuesで表示名形式）
+      enum:
+        - Default
+        - KeyValues
+
+    ApiColumnKeyDisplayType:
+      type: string
+      description: レスポンスのKeyの表示形式を指定
+      enum:
+        - LabelText
+        - ColumnName
+
+    ApiColumnValueDisplayType:
+      type: string
+      description: レスポンスのValueの表示形式を指定
+      enum:
+        - DisplayValue
+        - Value
+        - Text
+
+    # ---------- Item Data Schemas ----------
+    ItemData:
+      type: object
+      description: レコードデータ
+      properties:
+        Title:
+          type: string
+          description: タイトル項目
+        Body:
+          type: string
+          description: 内容項目
+        StartTime:
+          type: string
+          format: date-time
+          description: 開始日時（期限付きテーブルのみ）
+        CompletionTime:
+          type: string
+          format: date-time
+          description: 完了日時（期限付きテーブルのみ）
+        WorkValue:
+          type: number
+          description: 作業量（期限付きテーブルのみ）
+        ProgressRate:
+          type: number
+          description: 進捗率（期限付きテーブルのみ）
+        RemainingWorkValue:
+          type: number
+          description: 残作業量（期限付きテーブルのみ）
+        Status:
+          type: integer
+          description: 状況項目
+        Manager:
+          type: integer
+          description: 管理者のユーザID
+        Owner:
+          type: integer
+          description: 担当者のユーザID
+        Locked:
+          type: boolean
+          description: ロック状態
+        Comments:
+          type: string
+          description: コメント項目
+        ItemTitle:
+          type: string
+          description: タイトル項目（別名）
+        ClassHash:
+          $ref: '#/components/schemas/ClassHash'
+        NumHash:
+          $ref: '#/components/schemas/NumHash'
+        DateHash:
+          $ref: '#/components/schemas/DateHash'
+        DescriptionHash:
+          $ref: '#/components/schemas/DescriptionHash'
+        CheckHash:
+          $ref: '#/components/schemas/CheckHash'
+        AttachmentsHash:
+          $ref: '#/components/schemas/AttachmentsHash'
+
+    ResponseItem:
+      allOf:
+        - $ref: '#/components/schemas/ItemData'
+        - type: object
+          description: レコード取得時のレスポンスデータ
+          properties:
+            SiteId:
+              type: integer
+              format: int64
+              description: サイトID
+            UpdatedTime:
+              type: string
+              format: date-time
+              description: 更新日時
+            ResultId:
+              type: integer
+              format: int64
+              description: レコードID（記録テーブルの場合）
+            IssueId:
+              type: integer
+              format: int64
+              description: レコードID（期限付きテーブルの場合）
+            Ver:
+              type: integer
+              description: バージョン
+            Creator:
+              type: integer
+              description: 作成者のユーザID
+            Updator:
+              type: integer
+              description: 更新者のユーザID
+            CreatedTime:
+              type: string
+              format: date-time
+              description: 作成日時
+            ApiVersion:
+              type: number
+              description: APIバージョン
+
+    # ---------- Hash Schemas ----------
+    ClassHash:
+      type: object
+      description: 分類項目（ClassA～ClassZのキーと値のペア）
+      properties:
+        ClassA:
+          type: string
+        ClassB:
+          type: string
+        ClassC:
+          type: string
+        ClassD:
+          type: string
+        ClassE:
+          type: string
+        ClassF:
+          type: string
+        ClassG:
+          type: string
+        ClassH:
+          type: string
+        ClassI:
+          type: string
+        ClassJ:
+          type: string
+        ClassK:
+          type: string
+        ClassL:
+          type: string
+        ClassM:
+          type: string
+        ClassN:
+          type: string
+        ClassO:
+          type: string
+        ClassP:
+          type: string
+        ClassQ:
+          type: string
+        ClassR:
+          type: string
+        ClassS:
+          type: string
+        ClassT:
+          type: string
+        ClassU:
+          type: string
+        ClassV:
+          type: string
+        ClassW:
+          type: string
+        ClassX:
+          type: string
+        ClassY:
+          type: string
+        ClassZ:
+          type: string
+
+    NumHash:
+      type: object
+      description: 数値項目（NumA～NumZのキーと値のペア）
+      properties:
+        NumA:
+          type: number
+        NumB:
+          type: number
+        NumC:
+          type: number
+        NumD:
+          type: number
+        NumE:
+          type: number
+        NumF:
+          type: number
+        NumG:
+          type: number
+        NumH:
+          type: number
+        NumI:
+          type: number
+        NumJ:
+          type: number
+        NumK:
+          type: number
+        NumL:
+          type: number
+        NumM:
+          type: number
+        NumN:
+          type: number
+        NumO:
+          type: number
+        NumP:
+          type: number
+        NumQ:
+          type: number
+        NumR:
+          type: number
+        NumS:
+          type: number
+        NumT:
+          type: number
+        NumU:
+          type: number
+        NumV:
+          type: number
+        NumW:
+          type: number
+        NumX:
+          type: number
+        NumY:
+          type: number
+        NumZ:
+          type: number
+
+    DateHash:
+      type: object
+      description: 日付項目（DateA～DateZのキーと値のペア）
+      properties:
+        DateA:
+          type: string
+          format: date-time
+        DateB:
+          type: string
+          format: date-time
+        DateC:
+          type: string
+          format: date-time
+        DateD:
+          type: string
+          format: date-time
+        DateE:
+          type: string
+          format: date-time
+        DateF:
+          type: string
+          format: date-time
+        DateG:
+          type: string
+          format: date-time
+        DateH:
+          type: string
+          format: date-time
+        DateI:
+          type: string
+          format: date-time
+        DateJ:
+          type: string
+          format: date-time
+        DateK:
+          type: string
+          format: date-time
+        DateL:
+          type: string
+          format: date-time
+        DateM:
+          type: string
+          format: date-time
+        DateN:
+          type: string
+          format: date-time
+        DateO:
+          type: string
+          format: date-time
+        DateP:
+          type: string
+          format: date-time
+        DateQ:
+          type: string
+          format: date-time
+        DateR:
+          type: string
+          format: date-time
+        DateS:
+          type: string
+          format: date-time
+        DateT:
+          type: string
+          format: date-time
+        DateU:
+          type: string
+          format: date-time
+        DateV:
+          type: string
+          format: date-time
+        DateW:
+          type: string
+          format: date-time
+        DateX:
+          type: string
+          format: date-time
+        DateY:
+          type: string
+          format: date-time
+        DateZ:
+          type: string
+          format: date-time
+
+    DescriptionHash:
+      type: object
+      description: 説明項目（DescriptionA～DescriptionZのキーと値のペア）
+      properties:
+        DescriptionA:
+          type: string
+        DescriptionB:
+          type: string
+        DescriptionC:
+          type: string
+        DescriptionD:
+          type: string
+        DescriptionE:
+          type: string
+        DescriptionF:
+          type: string
+        DescriptionG:
+          type: string
+        DescriptionH:
+          type: string
+        DescriptionI:
+          type: string
+        DescriptionJ:
+          type: string
+        DescriptionK:
+          type: string
+        DescriptionL:
+          type: string
+        DescriptionM:
+          type: string
+        DescriptionN:
+          type: string
+        DescriptionO:
+          type: string
+        DescriptionP:
+          type: string
+        DescriptionQ:
+          type: string
+        DescriptionR:
+          type: string
+        DescriptionS:
+          type: string
+        DescriptionT:
+          type: string
+        DescriptionU:
+          type: string
+        DescriptionV:
+          type: string
+        DescriptionW:
+          type: string
+        DescriptionX:
+          type: string
+        DescriptionY:
+          type: string
+        DescriptionZ:
+          type: string
+
+    CheckHash:
+      type: object
+      description: チェック項目（CheckA～CheckZのキーと値のペア）
+      properties:
+        CheckA:
+          type: boolean
+        CheckB:
+          type: boolean
+        CheckC:
+          type: boolean
+        CheckD:
+          type: boolean
+        CheckE:
+          type: boolean
+        CheckF:
+          type: boolean
+        CheckG:
+          type: boolean
+        CheckH:
+          type: boolean
+        CheckI:
+          type: boolean
+        CheckJ:
+          type: boolean
+        CheckK:
+          type: boolean
+        CheckL:
+          type: boolean
+        CheckM:
+          type: boolean
+        CheckN:
+          type: boolean
+        CheckO:
+          type: boolean
+        CheckP:
+          type: boolean
+        CheckQ:
+          type: boolean
+        CheckR:
+          type: boolean
+        CheckS:
+          type: boolean
+        CheckT:
+          type: boolean
+        CheckU:
+          type: boolean
+        CheckV:
+          type: boolean
+        CheckW:
+          type: boolean
+        CheckX:
+          type: boolean
+        CheckY:
+          type: boolean
+        CheckZ:
+          type: boolean
+
+    AttachmentsHash:
+      type: object
+      description: 添付ファイル項目（AttachmentsA～AttachmentsZのキーと値のペア）
+      properties:
+        AttachmentsA:
+          $ref: '#/components/schemas/Attachments'
+        AttachmentsB:
+          $ref: '#/components/schemas/Attachments'
+        AttachmentsC:
+          $ref: '#/components/schemas/Attachments'
+        AttachmentsD:
+          $ref: '#/components/schemas/Attachments'
+        AttachmentsE:
+          $ref: '#/components/schemas/Attachments'
+        AttachmentsF:
+          $ref: '#/components/schemas/Attachments'
+        AttachmentsG:
+          $ref: '#/components/schemas/Attachments'
+        AttachmentsH:
+          $ref: '#/components/schemas/Attachments'
+        AttachmentsI:
+          $ref: '#/components/schemas/Attachments'
+        AttachmentsJ:
+          $ref: '#/components/schemas/Attachments'
+        AttachmentsK:
+          $ref: '#/components/schemas/Attachments'
+        AttachmentsL:
+          $ref: '#/components/schemas/Attachments'
+        AttachmentsM:
+          $ref: '#/components/schemas/Attachments'
+        AttachmentsN:
+          $ref: '#/components/schemas/Attachments'
+        AttachmentsO:
+          $ref: '#/components/schemas/Attachments'
+        AttachmentsP:
+          $ref: '#/components/schemas/Attachments'
+        AttachmentsQ:
+          $ref: '#/components/schemas/Attachments'
+        AttachmentsR:
+          $ref: '#/components/schemas/Attachments'
+        AttachmentsS:
+          $ref: '#/components/schemas/Attachments'
+        AttachmentsT:
+          $ref: '#/components/schemas/Attachments'
+        AttachmentsU:
+          $ref: '#/components/schemas/Attachments'
+        AttachmentsV:
+          $ref: '#/components/schemas/Attachments'
+        AttachmentsW:
+          $ref: '#/components/schemas/Attachments'
+        AttachmentsX:
+          $ref: '#/components/schemas/Attachments'
+        AttachmentsY:
+          $ref: '#/components/schemas/Attachments'
+        AttachmentsZ:
+          $ref: '#/components/schemas/Attachments'
+
+    Attachments:
+      type: array
+      description: 添付ファイルの配列
+      items:
+        $ref: '#/components/schemas/Attachment'
+
+    Attachment:
+      type: object
+      description: 添付ファイル
       properties:
         Guid:
           type: string
+          description: ファイルのGUID
         Name:
           type: string
+          description: ファイル名
         ContentType:
           type: string
+          description: Content-Type
         Base64:
           type: string
-  error40x:
-    type: object
-    properties:
-      Id:
-        type: integer
-        format: int64
-      StatusCode:
-        type: integer
-      Message:
-        type: string
-  error50x:
-    type: object
-    properties:
-      Message:
-        type: string
-  columnFilterSearchType:
-    type: string
-    description: 検索方法
-    enum:
-      - PartialMatch
-      - ExactMatch
-      - ForwardMatch
-      - PartialMatchMultiple
-      - ExactMatchMultiple
-      - ForwardMatchMultiple
-  imageHash:
-    type: object
-    description: 内容、コメント、説明項目に画像を挿入するためのオブジェクト
-    properties:
-      Body:
-        $ref: '#/definitions/imageHashItem'
-      Comments:
-        $ref: '#/definitions/imageHashItem'
-      DescriptionA:
-        $ref: '#/definitions/imageHashItem'
-      DescriptionB:
-        $ref: '#/definitions/imageHashItem'
-      DescriptionC:
-        $ref: '#/definitions/imageHashItem'
-      DescriptionD:
-        $ref: '#/definitions/imageHashItem'
-      DescriptionE:
-        $ref: '#/definitions/imageHashItem'
-      DescriptionF:
-        $ref: '#/definitions/imageHashItem'
-      DescriptionG:
-        $ref: '#/definitions/imageHashItem'
-      DescriptionH:
-        $ref: '#/definitions/imageHashItem'
-      DescriptionI:
-        $ref: '#/definitions/imageHashItem'
-      DescriptionJ:
-        $ref: '#/definitions/imageHashItem'
-      DescriptionK:
-        $ref: '#/definitions/imageHashItem'
-      DescriptionL:
-        $ref: '#/definitions/imageHashItem'
-      DescriptionM:
-        $ref: '#/definitions/imageHashItem'
-      DescriptionN:
-        $ref: '#/definitions/imageHashItem'
-      DescriptionO:
-        $ref: '#/definitions/imageHashItem'
-      DescriptionP:
-        $ref: '#/definitions/imageHashItem'
-      DescriptionQ:
-        $ref: '#/definitions/imageHashItem'
-      DescriptionR:
-        $ref: '#/definitions/imageHashItem'
-      DescriptionS:
-        $ref: '#/definitions/imageHashItem'
-      DescriptionT:
-        $ref: '#/definitions/imageHashItem'
-      DescriptionU:
-        $ref: '#/definitions/imageHashItem'
-      DescriptionV:
-        $ref: '#/definitions/imageHashItem'
-      DescriptionW:
-        $ref: '#/definitions/imageHashItem'
-      DescriptionX:
-        $ref: '#/definitions/imageHashItem'
-      DescriptionY:
-        $ref: '#/definitions/imageHashItem'
-      DescriptionZ:
-        $ref: '#/definitions/imageHashItem'
-  imageHashItem:
-    type: object
-    description: 画像挿入の詳細設定
-    properties:
-      HeadNewLine:
-        type: boolean
-        description: 画像を挿入する際の先頭の改行有無
-      EndNewLine:
-        type: boolean
-        description: 画像を挿入する際の末尾の改行有無
-      Position:
-        type: integer
-        description: 画像を何文字目に挿入するか（-1または省略で末尾）
-      Alt:
-        type: string
-        description: alt属性に挿入する文字列
-      Extension:
-        type: string
-        description: ファイル拡張子（省略時は.png）
-      Base64:
-        type: string
-        description: Base64エンコードした画像のバイナリデータ
-    required:
-      - Base64
+          description: Base64エンコードしたファイルデータ
+        Deleted:
+          type: integer
+          description: 削除フラグ（1で削除）
+
+    # ---------- Image Hash Schemas ----------
+    ImageHash:
+      type: object
+      description: 内容、コメント、説明項目に画像を挿入するためのオブジェクト
+      properties:
+        Body:
+          $ref: '#/components/schemas/ImageHashItem'
+        Comments:
+          $ref: '#/components/schemas/ImageHashItem'
+        DescriptionA:
+          $ref: '#/components/schemas/ImageHashItem'
+        DescriptionB:
+          $ref: '#/components/schemas/ImageHashItem'
+        DescriptionC:
+          $ref: '#/components/schemas/ImageHashItem'
+        DescriptionD:
+          $ref: '#/components/schemas/ImageHashItem'
+        DescriptionE:
+          $ref: '#/components/schemas/ImageHashItem'
+        DescriptionF:
+          $ref: '#/components/schemas/ImageHashItem'
+        DescriptionG:
+          $ref: '#/components/schemas/ImageHashItem'
+        DescriptionH:
+          $ref: '#/components/schemas/ImageHashItem'
+        DescriptionI:
+          $ref: '#/components/schemas/ImageHashItem'
+        DescriptionJ:
+          $ref: '#/components/schemas/ImageHashItem'
+        DescriptionK:
+          $ref: '#/components/schemas/ImageHashItem'
+        DescriptionL:
+          $ref: '#/components/schemas/ImageHashItem'
+        DescriptionM:
+          $ref: '#/components/schemas/ImageHashItem'
+        DescriptionN:
+          $ref: '#/components/schemas/ImageHashItem'
+        DescriptionO:
+          $ref: '#/components/schemas/ImageHashItem'
+        DescriptionP:
+          $ref: '#/components/schemas/ImageHashItem'
+        DescriptionQ:
+          $ref: '#/components/schemas/ImageHashItem'
+        DescriptionR:
+          $ref: '#/components/schemas/ImageHashItem'
+        DescriptionS:
+          $ref: '#/components/schemas/ImageHashItem'
+        DescriptionT:
+          $ref: '#/components/schemas/ImageHashItem'
+        DescriptionU:
+          $ref: '#/components/schemas/ImageHashItem'
+        DescriptionV:
+          $ref: '#/components/schemas/ImageHashItem'
+        DescriptionW:
+          $ref: '#/components/schemas/ImageHashItem'
+        DescriptionX:
+          $ref: '#/components/schemas/ImageHashItem'
+        DescriptionY:
+          $ref: '#/components/schemas/ImageHashItem'
+        DescriptionZ:
+          $ref: '#/components/schemas/ImageHashItem'
+
+    ImageHashItem:
+      type: object
+      description: 画像挿入の詳細設定
+      required:
+        - Base64
+      properties:
+        HeadNewLine:
+          type: boolean
+          description: 画像を挿入する際の先頭の改行有無
+        EndNewLine:
+          type: boolean
+          description: 画像を挿入する際の末尾の改行有無
+        Position:
+          type: integer
+          description: 画像を何文字目に挿入するか（-1または省略で末尾）
+        Alt:
+          type: string
+          description: alt属性に挿入する文字列
+        Extension:
+          type: string
+          description: ファイル拡張子（省略時は.png）
+          example: .jpeg
+        Base64:
+          type: string
+          description: Base64エンコードした画像のバイナリデータ
